@@ -43,6 +43,7 @@ export async function GET(
       lrn: student.lrn || null,
       gradeId: student.gradeId?.toString() || null,
       sectionId: student.sectionId?.toString() || null,
+      birthday: student.birthday || null,
     });
   } catch (err: any) {
     console.error(err);
@@ -62,7 +63,7 @@ export async function PUT(
 ) {
   const params = await context.params;
   const { id, sectionId, studentId } = params;
-  const { name, email, schoolStudentId, lrn } = await req.json();
+  const { name, email, schoolStudentId, lrn, birthday } = await req.json();
   const user = requireAuth(req, ["admin", "nurse"]);
   if (user instanceof NextResponse) return user;
 
@@ -81,6 +82,7 @@ export async function PUT(
           email: email || null,
           schoolStudentId: schoolStudentId || null,
           lrn: lrn || null,
+          birthday: birthday ? new Date(birthday + "T00:00:00") : null,
           updatedAt: new Date(),
         },
       },

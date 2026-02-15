@@ -92,6 +92,7 @@ export default function SectionDashboard() {
     email?: string,
     schoolStudentId?: string,
     lrn?: string,
+    birthday?: string, // added birthday
   ) => {
     if (!isAdmin && !isNurse) return; // RBAC guard
     try {
@@ -108,7 +109,7 @@ export default function SectionDashboard() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ name, email, schoolStudentId, lrn }),
+          body: JSON.stringify({ name, email, schoolStudentId, lrn, birthday }), // include birthday
         },
       );
 
@@ -120,7 +121,7 @@ export default function SectionDashboard() {
       const data = await res.json();
       setStudents((prev) => [
         ...prev,
-        { _id: data.insertedId, name, email, schoolStudentId, lrn },
+        { _id: data.insertedId, name, email, schoolStudentId, lrn, birthday },
       ]);
     } catch (err: any) {
       console.error(err);
@@ -130,7 +131,6 @@ export default function SectionDashboard() {
     }
   };
 
-
   // Edit student
   const handleEditStudent = async (
     studentId: string,
@@ -138,6 +138,7 @@ export default function SectionDashboard() {
     email?: string,
     schoolStudentId?: string,
     lrn?: string,
+    birthday?: string, // added birthday
   ) => {
     if (!isAdmin && !isNurse) return; // RBAC guard
     try {
@@ -154,7 +155,7 @@ export default function SectionDashboard() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // <-- attach token
           },
-          body: JSON.stringify({ name, email, schoolStudentId, lrn }),
+          body: JSON.stringify({ name, email, schoolStudentId, lrn, birthday }), // include birthday
         },
       );
 
@@ -165,7 +166,9 @@ export default function SectionDashboard() {
 
       setStudents((prev) =>
         prev.map((s) =>
-          s._id === studentId ? { ...s, name, email, schoolStudentId, lrn } : s,
+          s._id === studentId
+            ? { ...s, name, email, schoolStudentId, lrn, birthday }
+            : s,
         ),
       );
       setEditingStudent(null);
@@ -208,7 +211,6 @@ export default function SectionDashboard() {
       console.error(err);
     }
   };
-
 
   if (authLoading || !user) return null;
 
@@ -279,7 +281,11 @@ export default function SectionDashboard() {
                     }
                     description={`Email: ${student.email || "-"} | Student ID: ${
                       student.schoolStudentId || "-"
-                    } | LRN: ${student.lrn || "-"}`}
+                    } | LRN: ${student.lrn || "-"} | Birthday: ${
+                      student.birthday
+                        ? new Date(student.birthday).toLocaleDateString()
+                        : "-"
+                    }`}
                   />
                 ))}
 
@@ -300,24 +306,18 @@ export default function SectionDashboard() {
             initialEmail={editingStudent.email}
             initialSchoolStudentId={editingStudent.schoolStudentId}
             initialLrn={editingStudent.lrn}
+            initialBirthday={editingStudent.birthday} // added birthday here
             saving={saving}
             onClose={() => setEditingStudent(null)}
-            onSubmit={(name, email, schoolStudentId, lrn) =>
+            onSubmit={(name, email, schoolStudentId, lrn, birthday) =>
               handleEditStudent(
                 editingStudent._id,
                 name,
                 email,
                 schoolStudentId,
                 lrn,
+                birthday, // pass birthday to edit
               )
-            }
-            onDelete={
-              isAdmin && editingStudent._id
-                ? async () => {
-                    await handleDeleteStudent(editingStudent._id);
-                    setEditingStudent(null);
-                  }
-                : undefined
             }
           />
         )}

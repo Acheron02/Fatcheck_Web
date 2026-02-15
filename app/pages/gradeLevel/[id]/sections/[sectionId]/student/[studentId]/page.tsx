@@ -13,6 +13,7 @@ interface Student {
   email?: string;
   schoolStudentId?: string;
   lrn?: string;
+  birthday?: string; // ISO string
   gradeName?: string;
   sectionName?: string;
 }
@@ -56,6 +57,7 @@ export default function StudentProfilePage() {
         const token = localStorage.getItem("fatcheckToken");
         if (!token) throw new Error("Unauthorized");
 
+        // Fetch student
         const res = await fetch(
           `/api/gradeLevels/${id}/sections/${sectionId}/students/${studentId}`,
           { headers: { Authorization: `Bearer ${token}` } },
@@ -64,6 +66,7 @@ export default function StudentProfilePage() {
 
         const data: Student = await res.json();
 
+        // Fetch grade and section names
         const gradeRes = await fetch(`/api/gradeLevels/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -100,9 +103,7 @@ export default function StudentProfilePage() {
     const fetchRecords = async () => {
       try {
         setLoadingRecords(true);
-        const res = await fetch(
-          `/api/students/${studentId}/records`, // your Raspi endpoint
-        );
+        const res = await fetch(`/api/students/${studentId}/records`);
         if (!res.ok) throw new Error("Failed to fetch records");
         const data: Record[] = await res.json();
         setRecords(data);
@@ -146,6 +147,13 @@ export default function StudentProfilePage() {
       </div>
     );
 
+  const birthdayDisplay = student.birthday
+    ? `${new Date(student.birthday).toLocaleDateString()} (${Math.floor(
+        (Date.now() - new Date(student.birthday).getTime()) /
+          (1000 * 60 * 60 * 24 * 365.25),
+      )} yrs)`
+    : "-";
+
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -168,6 +176,9 @@ export default function StudentProfilePage() {
             </p>
             <p>
               <strong>LRN:</strong> {student.lrn || "-"}
+            </p>
+            <p>
+              <strong>Birthday:</strong> {birthdayDisplay}
             </p>
             <p>
               <strong>Grade Level:</strong>{" "}

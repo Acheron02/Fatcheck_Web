@@ -1,4 +1,3 @@
-// AddStudentCard.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -6,8 +5,14 @@ import { Plus } from "lucide-react";
 import StudentFormDialog from "./StudentFormDialog";
 
 interface AddStudentCardProps {
-  onAdd: (name: string, email?: string, schoolStudentId?: string, lrn?: string) => Promise<void>;
-  disabled?: boolean; // optional, like saving state
+  onAdd: (
+    name: string,
+    email?: string,
+    schoolStudentId?: string,
+    lrn?: string,
+    birthday?: string,
+  ) => Promise<void>;
+  disabled?: boolean;
 }
 
 export default function AddStudentCard({
@@ -30,14 +35,14 @@ export default function AddStudentCard({
         </div>
       </div>
 
-      {/* Dialog for adding a student */}
+      {/* Dialog */}
       <StudentFormDialog
         open={open}
         title="Add Student"
         onClose={() => setOpen(false)}
-        onSubmit={async (name, email, schoolStudentId, lrn) => {
-          await onAdd(name, email, schoolStudentId, lrn);
-          setOpen(false); // close dialog only after adding
+        onSubmit={async (name, email, schoolStudentId, lrn, birthday) => {
+          await onAdd(name, email, schoolStudentId, lrn, birthday);
+          setOpen(false);
         }}
       />
     </>
